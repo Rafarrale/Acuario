@@ -16,6 +16,8 @@ ESP8266WiFiMulti wifiMulti;       // Create an instance of the ESP8266WiFiMulti 
 #define IN3  D2
 #define IN4  D3
 
+String datosAlimentador[10];
+int auxAli = 0;
 ESP8266WebServer server = ESP8266WebServer(80);       // create a web server on port 80
 ESP8266HTTPUpdateServer httpUpdater;
 WebSocketsServer webSocket = WebSocketsServer(81);    // create a websocket server on port 81
@@ -98,7 +100,7 @@ void setup() {
 
   timeClient.begin();
   timeClient.update();
-  hora = (timeClient.getHours() + 12) % 24; 
+  hora = (timeClient.getHours() ) % 24; 
   //Serial.println(hora);
   
 }
@@ -127,7 +129,11 @@ void loop() {
     hora = (hora + 12) % 24;
     activaMotor();
     forceUpdate();
-    Serial.println(hora);
+    datosAlimentador[auxAli] = "Hora activacion: " + timeClient.getFormattedTime();
+    auxAli++;
+    if(auxAli == 10){
+      auxAli = 0;
+    }
   }
   
 }
@@ -267,6 +273,9 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t lenght
         
         // send message to client
         webSocket.sendTXT(num, "Connected");
+        for(int i = 0; i <10 ;i++){
+          webSocket.sendTXT(numAux, datosAlimentador[i]);
+        }
         
         rainbow = false;                  // Turn rainbow off when a new connection is established
       }
@@ -351,10 +360,7 @@ void checkOST(void) {
   if (currentMillis - previousMillis > 10000) {
     previousMillis = currentMillis;    // Salva el tiempo actual
 //    printf("Time Epoch: %d: ", timeClient.getEpochTime());
-    Serial.println(timeClient.getFormattedTime());
-    // send message to client
-      webSocket.sendTXT(numAux, "Hora");
-  
+    Serial.println(timeClient.getFormattedTime());  
   }
 }
 

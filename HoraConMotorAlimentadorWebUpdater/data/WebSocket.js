@@ -1,14 +1,19 @@
 var rainbowEnable = false;
 var connection = new WebSocket('ws://'+location.hostname+':81/', ['arduino']);
+
+output = document.getElementById("chatbox");
+
 connection.onopen = function () {
     connection.send('Connect ' + new Date());
 };
 connection.onerror = function (error) {
     console.log('WebSocket Error ', error);
 };
-connection.onmessage = function (e) {  
-    console.log('Server: ', e.data);    
+connection.onmessage = function (event) {  
+   console.log('Server: ', event.data);  
+   writeToScreen(event.data);
 
+    
 };
 connection.onclose = function(){
     console.log('WebSocket connection closed');
@@ -23,6 +28,17 @@ function sendRGB() {
     var rgbstr = '#'+ rgb.toString(16);    
     console.log('RGB: ' + rgbstr); 
     connection.send(rgbstr);
+}
+
+function writeToScreen(message) {
+    var str = message;
+    var n = str.search("activacion");
+    if(n == 5){
+        var node = document.createElement("LI");
+        var textnode = document.createTextNode(message);
+        node.appendChild(textnode);
+        document.getElementById("chatbox").appendChild(node);
+    }
 }
 
 function rainbowEffect(){
