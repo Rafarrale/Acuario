@@ -65,6 +65,8 @@ uint32_t hora = 0;
 
 NTPClient timeClient(ntpUDP, "a.st1.ntp.br", utc*3600, 60000);
 
+uint8_t numAux;
+
 /*__________________________________________________________SETUP__________________________________________________________*/
 
 void setup() {
@@ -105,6 +107,7 @@ void setup() {
 
 void loop() {
   webSocket.loop();                           // constantly check for websocket events
+
   server.handleClient();                      // run the server
 
   //Chama a verificacao de tempo
@@ -261,6 +264,10 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t lenght
     case WStype_CONNECTED: {              // if a new websocket connection is established
         IPAddress ip = webSocket.remoteIP(num);
         Serial.printf("[%u] Connected from %d.%d.%d.%d url: %s\n", num, ip[0], ip[1], ip[2], ip[3], payload);
+        
+        // send message to client
+        webSocket.sendTXT(num, "Connected");
+        
         rainbow = false;                  // Turn rainbow off when a new connection is established
       }
       break;
@@ -345,7 +352,9 @@ void checkOST(void) {
     previousMillis = currentMillis;    // Salva el tiempo actual
 //    printf("Time Epoch: %d: ", timeClient.getEpochTime());
     Serial.println(timeClient.getFormattedTime());
-    
+    // send message to client
+      webSocket.sendTXT(numAux, "Hora");
+  
   }
 }
 
@@ -374,3 +383,4 @@ void activaMotor(){
     delay (1) ; //Velocidad de giro del motor
   }
 }
+
