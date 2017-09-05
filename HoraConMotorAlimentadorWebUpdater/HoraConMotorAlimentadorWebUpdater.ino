@@ -11,10 +11,10 @@
 ESP8266WiFiMulti wifiMulti;       // Create an instance of the ESP8266WiFiMulti class, called 'wifiMulti'
 
 #define LED_BUILTIN 2
-#define IN1  D0
-#define IN2  D1
-#define IN3  D2
-#define IN4  D3
+#define IN1  16
+#define IN2  5
+#define IN3  4
+#define IN4  0
 
 String datosAlimentador[10];
 int auxAli = 0;
@@ -28,9 +28,9 @@ const char *ssid = "ESP8266 Access Point"; // The name of the Wi-Fi network that
 const char *password = "thereisnospoon";   // The password required to connect to it, leave blank for an open network
 
 
-#define LED_RED     D0            // specify the pins with an RGB LED connected
-#define LED_GREEN   D1  
-#define LED_BLUE    D2
+#define LED_RED     2            // specify the pins with an RGB LED connected
+#define ledAcuario   14  
+#define LED_BLUE    12
 
 const char* mdnsName = "esp8266"; // Domain name for the mDNS responder
 bool rainbow = false;             // The rainbow effect is turned off on startup
@@ -73,7 +73,7 @@ uint8_t numAux;
 
 void setup() {
   pinMode(LED_RED, OUTPUT);    // the pins with LEDs connected are outputs
-  pinMode(LED_GREEN, OUTPUT);
+  pinMode(ledAcuario, OUTPUT);
   pinMode(LED_BLUE, OUTPUT);
 
   Serial.begin(115200);        // Start the Serial communication to send messages to the computer
@@ -289,7 +289,7 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t lenght
         int b =          rgb & 0x3FF;                      // B: bits  0-9
 
         analogWrite(LED_RED,   r);                         // write it to the LED output pins
-        analogWrite(LED_GREEN, g);
+        analogWrite(ledAcuario, g);
         analogWrite(LED_BLUE,  b);
       } else if (payload[0] == 'R') {                      // the browser sends an R when the rainbow effect is enabled
         rainbow = true;
@@ -346,7 +346,7 @@ void setHue(int hue) { // Set the RGB LED to a given hue (color) (0° = Red, 120
   int b = bf*bf*1023;
   
   analogWrite(LED_RED,   r);    // Write the right color to the LED output pins
-  analogWrite(LED_GREEN, g);
+  analogWrite(ledAcuario, g);
   analogWrite(LED_BLUE,  b);
 }
 
