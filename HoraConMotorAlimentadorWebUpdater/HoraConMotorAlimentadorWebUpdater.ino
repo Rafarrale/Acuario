@@ -15,28 +15,19 @@ ESP8266WiFiMulti wifiMulti;       // Create an instance of the ESP8266WiFiMulti 
 #define IN2  5
 #define IN3  4
 #define IN4  0
-
-String datosAlimentador[10];
-int auxAli = 0;
-ESP8266WebServer server = ESP8266WebServer(80);       // create a web server on port 80
-ESP8266HTTPUpdateServer httpUpdater;
-WebSocketsServer webSocket = WebSocketsServer(81);    // create a websocket server on port 81
-
-File fsUploadFile;                                    // a File variable to temporarily store the received file
-
-const char *ssid = "ESP8266 Access Point"; // The name of the Wi-Fi network that will be created
-const char *password = "thereisnospoon";   // The password required to connect to it, leave blank for an open network
-
-
 #define LED_RED     2            // specify the pins with an RGB LED connected
 #define ledAcuario   14  
 #define LED_BLUE    12
 
-const char* mdnsName = "esp8266"; // Domain name for the mDNS responder
-bool rainbow = false;             // The rainbow effect is turned off on startup
-
-unsigned long prevMillis = millis();
+String datosAlimentador[1];
+int auxAli = 0;
+int acuario = 0;
 int hue = 0;
+uint8_t numAux;
+bool rainbow = false;             // The rainbow effect is turned off on startup
+bool datosLed = false;				//Prevalece que exista cliente conectado para establecer la iluminacion de los led
+unsigned long prevMillis = millis();
+
 
 
 //  variables que cambiarán de valor.
@@ -67,7 +58,15 @@ uint32_t hora = 0;
 
 NTPClient timeClient(ntpUDP, "a.st1.ntp.br", utc*3600, 60000);
 
-uint8_t numAux;
+ESP8266WebServer server = ESP8266WebServer(80);       // create a web server on port 80
+ESP8266HTTPUpdateServer httpUpdater;
+WebSocketsServer webSocket = WebSocketsServer(81);    // create a websocket server on port 81
+
+File fsUploadFile;                                    // a File variable to temporarily store the received file
+
+const char *ssid = "ESP8266 Access Point"; // The name of the Wi-Fi network that will be created
+const char *password = "thereisnospoon";   // The password required to connect to it, leave blank for an open network
+const char* mdnsName = "esp8266"; // Domain name for the mDNS responder
 
 /*__________________________________________________________SETUP__________________________________________________________*/
 
@@ -100,7 +99,7 @@ void setup() {
 
   timeClient.begin();
   timeClient.update();
-  hora = (timeClient.getHours() ) % 24; 
+  hora = (timeClient.getHours()) % 24; 
   //Serial.println(hora);
   
 }
@@ -131,10 +130,19 @@ void loop() {
     forceUpdate();
     datosAlimentador[auxAli] = "Hora activacion: " + timeClient.getFormattedTime();
     auxAli++;
-    if(auxAli == 10){
+    if(auxAli == 1){
       auxAli = 0;
     }
   }
+	
+ if (timeClient.getHours() >= 0 && timeClient.getHours() < 7 && datosLed == false) {
+	 acuario = 0;
+	 analogWrite(ledAcuario, acuario);
+ }
+ else if(timeClient.getHours() >= 7 && timeClient.getHours() <= 23 && datosLed == false) {
+	 acuario = 1023;
+	 analogWrite(ledAcuario, acuario);
+ }
   
 }
 
@@ -266,6 +274,7 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t lenght
   switch (type) {
     case WStype_DISCONNECTED:             // if the websocket is disconnected
       Serial.printf("[%u] Disconnected!\n", num);
+	  datosLed = false; 
       break;
     case WStype_CONNECTED: {              // if a new websocket connection is established
         IPAddress ip = webSocket.remoteIP(num);
@@ -273,9 +282,8 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t lenght
         
         // send message to client
         webSocket.sendTXT(num, "Connected");
-        for(int i = 0; i <10 ;i++){
-          webSocket.sendTXT(numAux, datosAlimentador[i]);
-        }
+        webSocket.sendTXT(num, datosAlimentador[0]);
+        
         
         rainbow = false;                  // Turn rainbow off when a new connection is established
       }
@@ -285,17 +293,18 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t lenght
       if (payload[0] == '#') {            // we get RGB data
         uint32_t rgb = (uint32_t) strtol((const char *) &payload[1], NULL, 16);   // decode rgb data
         int r = ((rgb >> 20) & 0x3FF);                     // 10 bits per color, so R: bits 20-29
-        int g = ((rgb >> 10) & 0x3FF);                     // G: bits 10-19
+        acuario = ((rgb >> 10) & 0x3FF);                     // G: bits 10-19
         int b =          rgb & 0x3FF;                      // B: bits  0-9
 
         analogWrite(LED_RED,   r);                         // write it to the LED output pins
-        analogWrite(ledAcuario, g);
+        analogWrite(ledAcuario, acuario);
         analogWrite(LED_BLUE,  b);
       } else if (payload[0] == 'R') {                      // the browser sends an R when the rainbow effect is enabled
         rainbow = true;
       } else if (payload[0] == 'N') {                      // the browser sends an N when the rainbow effect is disabled
         rainbow = false;
       }
+	  datosLed = true;
       break;
   }
 }

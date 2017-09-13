@@ -1,9 +1,11 @@
 center {
-    width: 420px;
-    max-width: 100%;
-    margin: 0px auto;
-    font-family: 'Roboto', sans-serif;
-    color: #444;
+	width: 420px;
+	max-width: 100%;
+	margin-top: 0px;
+	margin-right: auto;
+	margin-bottom: 0px;
+	font-family: 'Roboto', sans-serif;
+	color: #444;
 }
 
 header {
@@ -16,14 +18,16 @@ header {
 }
 
 h1 {
-    margin: 0px;
-    font-family: 'Roboto', sans-serif;
-    font-size: 32;
+	font-family: 'Roboto', sans-serif;
+	font-size: 32;
 }
 
 center>div {
-    padding: 24px 10px 10px 10px;
-    box-shadow: 1px 1px 5px #555555;
+	padding-top: 0px;
+	padding-right: 0px;
+	padding-left: 0px;
+	padding-bottom: 0px;
+	box-shadow: 10px 1px 5px #555555;
 }
 
 table {
@@ -39,18 +43,30 @@ tr {
     width: 100%;
 }
 
+.contLedAli{
+	width: 100%;
+	max-width: 500px; /*Todos los lementos esten alineados hacia el centro*/
+	margin: 0 auto; 
+	overflow: hidden;
+	
+	
+	
+   }
 .button {
-    text-decoration: none;
-    border: none;
-    color: white;
-    background-color: #00878F;
-    padding: 6px 24px;
-    font-size: 16px;
-    cursor: pointer;
-    box-shadow: 1px 1px 6px #555;
-    outline: none;
-    margin: 12px auto 0px auto;
-    display: inline-block;
+	text-decoration: none;
+	border: none;
+	color: white;
+	background-color: #00878F;
+	padding: 6px 24px;
+	font-size: 16px;
+	cursor: pointer;
+	box-shadow: 1px 1px 6px #555;
+	outline: none;
+	margin-top: 10px;
+	margin-right: auto;
+	margin-left: auto;
+	margin-bottom: 10px;
+	display: inline-block;
 }
 
 .button:hover {
@@ -96,10 +112,14 @@ input.enabled[type=range]::-webkit-slider-runnable-track {
 
 /*_______________Chatbox________________*/
 body {
-    font:12px arial;
-    color: #222;
-    text-align:center;
-    padding:35px; }
+	font: 12px arial;
+	color: #222;
+	text-align: center;
+	padding-top: 1%;
+	padding-right: 0%;
+	padding-left: 0%;
+	padding-bottom: 0%;
+}
   
 form, p, span {
     margin:0;
@@ -114,27 +134,41 @@ a {
     a:hover { text-decoration:underline; }
   
 #wrapper, #loginform {
-    padding-bottom:1px;
-    background:#EBF4FB;
-    width:100px;
-    border:1px solid #ACD8F0; }
-  
+	padding-bottom: 0px;
+	background: #EBF4FB;
+	width: 25%;
+	border: 1px solid #ACD8F0;
+	padding-left: 0%;
+	padding-right: 0px;
+	padding-top: 0px;
+}
+
 #loginform { padding-top:18px; }
   
     #loginform p { margin: 5px; }
   
 #chatbox {
-    text-align:left;
-    margin:0 auto;
-    margin-bottom:20px;
-    padding:10px;
-    background:#fff;
-    height:240px;
-    width:50px;
-    border:1px solid #ACD8F0;
-    overflow:auto; }
+	margin-top: 0px;
+	margin-right: auto;
+	margin-left: auto;
+	margin-bottom: 10px;
+	margin-bottom: 10px;
+	padding-top: 10px;
+	padding-right: 10px;
+	padding-left: 10px;
+	padding-bottom: 30px;
+	background: #fff;
+	height: 30px;
+	width: 60px;
+	border: 1px solid #ACD8F0;
+	overflow: auto;
+}
   
 .error { color: #ff0000; }
 
   
 
+.LogChat {
+}
+.LedCuadro {
+}
