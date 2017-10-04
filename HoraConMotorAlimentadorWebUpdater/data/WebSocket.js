@@ -1,5 +1,7 @@
 var rainbowEnable = false;
+//var connection = new WebSocket('ws://'+location.hostname+':81/', ['arduino']);
 var connection = new WebSocket('ws://'+location.hostname+':81/', ['arduino']);
+var cont = 0;
 
 output = document.getElementById("chatbox");
 
@@ -12,6 +14,7 @@ connection.onerror = function (error) {
 connection.onmessage = function (event) {  
    console.log('Server: ', event.data);  
    writeToScreen(event.data);
+   muestraTemp(event.data);
 
     
 };
@@ -66,3 +69,26 @@ function rainbowEffect(){
         console.log('N');
     }  
 }
+
+function contador(){
+	connection.send("T");
+}
+
+function muestraTemp(message){
+	var str = message;
+    var n = str.search("temperatura");
+	if(n == 0){
+		var res = str.split(" ");
+		var newItem = document.createElement("LI");       // Create a <li> node
+		var textnode = document.createTextNode(res[1]);  // Create a text node
+		newItem.appendChild(textnode);                    // Append the text to <li>
+
+		var list = document.getElementById("chatboxTemp");    // Get the <ul> element to insert a new node
+		list.insertBefore(newItem, list.childNodes[0]);  // Insert <li> before the first child of 
+	}
+}
+
+setInterval('contador()',5000);
+
+
+

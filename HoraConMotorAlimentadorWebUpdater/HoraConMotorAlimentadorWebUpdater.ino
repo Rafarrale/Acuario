@@ -18,6 +18,11 @@ ESP8266WiFiMulti wifiMulti;       // Create an instance of the ESP8266WiFiMulti 
 #define LED_RED     2            // specify the pins with an RGB LED connected
 #define ledAcuario   14  
 #define LED_BLUE    12
+								  // Declaracion de variables globales
+float tempC; // Variable para almacenar el valor obtenido del sensor (0 a 1023)
+int pinLM35 = A0; // Variable del pin de entrada del sensor (A0)
+int resTemp = 0;
+int TempEnvio = 0;
 
 String datosAlimentador[1];
 int auxAli = 0;
@@ -54,6 +59,8 @@ WiFiUDP ntpUDP;
 int16_t utc = +2; //UTC +2:00 España
 uint32_t currentMillis = 0;
 uint32_t previousMillis = 0;
+uint32_t previousMillisTemperatura = 0;
+int auxTemp = 0;
 uint32_t hora = 0;
 
 NTPClient timeClient(ntpUDP, "a.st1.ntp.br", utc*3600, 60000);
@@ -143,7 +150,10 @@ void loop() {
 	 acuario = 1023;
 	 analogWrite(ledAcuario, acuario);
  }
-  
+ //Metodo a temperatura
+ //________________________
+ temperatura();
+
 }
 
 /*__________________________________________________________SETUP_FUNCTIONS__________________________________________________________*/
@@ -284,7 +294,6 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t lenght
         webSocket.sendTXT(num, "Connected");
         webSocket.sendTXT(num, datosAlimentador[0]);
         
-        
         rainbow = false;                  // Turn rainbow off when a new connection is established
       }
       break;
@@ -305,6 +314,9 @@ void webSocketEvent(uint8_t num, WStype_t type, uint8_t * payload, size_t lenght
         rainbow = false;
       }
 	  datosLed = true;
+	  if (payload[0] == 'T') {
+		  webSocket.sendTXT(num, "temperatura " + String(TempEnvio));
+	  }
       break;
   }
 }
@@ -399,3 +411,27 @@ void activaMotor(){
   }
 }
 
+void temperatura() {
+	//Temperatura
+	//_____________________
+	if (currentMillis - previousMillisTemperatura > 50) {
+		previousMillisTemperatura = currentMillis;    // Salva el tiempo actual							
+													  // Con analogRead leemos el sensor, recuerda que es un valor de 0 a 1023
+		tempC = analogRead(pinLM35);
+		// Calculamos la temperatura con la fórmula
+		tempC = (3.3 * tempC * 100.0) / 1024.0;
+		resTemp = resTemp + tempC;
+		auxTemp++;
+	}
+
+	if (auxTemp == 100) {
+		resTemp = resTemp / 100;
+		TempEnvio = resTemp;
+		// Envia el dato al puerto serial
+		Serial.print(TempEnvio);
+		// Salto de línea
+		Serial.print("\n");
+		resTemp = 0;
+		auxTemp = 0;
+	}
+}
